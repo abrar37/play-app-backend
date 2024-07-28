@@ -23,7 +23,7 @@ const registerUser = asyncHandler( async (req, res) => {
 
     //Getting user details
     const {username, email, password, fullName} = req.body
-    console.log("Email: ", email)
+    // console.log("Email: ", email)
 
     // Validation
     // if (username === "") {
@@ -38,22 +38,34 @@ const registerUser = asyncHandler( async (req, res) => {
     }
 
     // If user already exist
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or: [{ username }, { email }]
     })
     if (existedUser) {
         throw new ApiError(409, "User with this username or email is already exists")
     }
 
+    // console.log(req.files);
+
     // checking for image, check for avatar
-    const avatarLocalPath = req.fiels?.avatar[0]?.path;
-    const coverImageLocalPath = req.fiels?.coverImage?.path;
+    const avatarLocalPath = req.files?.avatar[0]?.path;
+    const coverImageLocalPath = req.fiels?.coverImage[0]?.path;
+
+    // let coverImageLocalPath;
+    // if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.lenght > 0) {
+    //     coverImageLocalPath = req.files.coverImage[0].path;
+    // }
+
+    // console.log("coverImageLocalPath: ", coverImageLocalPath)
+    // console.log("avatarLocalPath: ", avatarLocalPath)
 
     if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is required")
+        throw new ApiError(400, "avatarLocalPath: Avatar file is required")
     }
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
+
+    // console.log("coverImage status:", coverImage);
 
     if (!avatar) {
         throw new ApiError(400, "Avatar file is required")
@@ -61,12 +73,12 @@ const registerUser = asyncHandler( async (req, res) => {
 
     // creating user object - create entry in db
     const user = await User.create({
+        username: username.toLowerCase(),
+        email,
         fullName,
         avatar: avatar.url,
         coverImage: coverImage?.url || "",
-        email, 
-        password,
-        username: username.toLowerCase()
+        password
     })
 
     const createdUser = await User.findById(user._id).select(
