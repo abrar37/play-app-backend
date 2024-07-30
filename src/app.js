@@ -4,6 +4,11 @@ import cookieParser from "cookie-parser";
 
 const app = express()
 
+// app.get('/', (req, res) => {
+//     res.send('Hello Backend!')
+// })
+
+
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true
@@ -21,5 +26,6 @@ import userRouter from "./routes/user.routes.js"
 app.use("/api/v1/users", userRouter)
 
 // Example Route: http://localhost:3000/api/v1/users/register
+
 
 export {app}
