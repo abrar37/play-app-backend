@@ -4,9 +4,9 @@ import cookieParser from "cookie-parser";
 
 const app = express()
 
-// app.get('/', (req, res) => {
-//     res.send('Hello Backend!')
-// })
+app.get('/', (req, res) => {
+    res.send('Hello Backend!')
+})
 
 
 app.use(cors({
@@ -20,12 +20,14 @@ app.use(cookieParser())
 
 // Import Routes
 import userRouter from "./routes/user.routes.js"
-
+import healthRouter from "./routes/healthcheck.routes.js"
 
 // Routes declaration
 app.use("/api/v1/users", userRouter)
-
 // Example Route: http://localhost:3000/api/v1/users/register
+
+app.use("/api/v1", healthRouter)
+// Example Route: http://localhost:3000/api/v1/health-check
 
 
 export {app}
